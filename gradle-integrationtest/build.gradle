@@ -14,7 +14,19 @@ dependencies {
     }
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation 'com.intuit.karate:karate-apache:0.9.6'
+    testImplementation 'com.intuit.karate:karate-junit5:0.9.6'
 }
+
+sourceSets {
+    test {
+        resources {
+            srcDirs = ['src/test/resources','src/test/java'] // define `src/test/resources` and `src/test/java` as resource folders
+            exclude '**/*.java'
+        }
+    }
+}
+
 
 //Add below code to access functionlity of other subproject
 //compile project(':gradle-sourcecode-demo')
