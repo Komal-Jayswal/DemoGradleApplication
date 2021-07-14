@@ -1,0 +1,24 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group 'com.apmoller.integrationtest.demo'
+version '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+dependencies {
+    implementation ('org.springframework.boot:spring-boot-starter-web'){
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+        exclude group: "ch.qos.logback", module: "logback-classic"
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+//Add below code to access functionlity of other subproject
+//compile project(':gradle-sourcecode-demo')
+
+test {
+    useJUnitPlatform()
+}

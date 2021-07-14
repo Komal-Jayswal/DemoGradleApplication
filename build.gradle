@@ -1,0 +1,36 @@
+plugins {
+	id 'java'
+}
+
+group = 'com.apmoller.gradle.multimodule.project'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+allprojects {
+	apply plugin: 'java'
+
+	repositories {
+		mavenCentral()
+		maven {
+			url "https://tools-nexus.maerskdev.net/repository/maven-group-public/"
+			credentials {
+				username 'yourusername'
+				password 'yourpassword'
+			}
+		}
+		//Above username and password must be stored in gradle.properties.
+		// -This will be done asap -next task
+		//Till then update your nexus username and password
+	}
+	//dependencies {}
+}
+
+/*
+subprojects {
+	apply plugin:
+	dependencies {}
+	test {
+		useJUnitPlatform()
+	}
+}
+*/

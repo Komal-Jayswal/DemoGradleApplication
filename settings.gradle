@@ -1,0 +1,4 @@
+rootProject.name = 'gradlemultimoduleprojectmain'
+include 'gradle-sourcecode-demo'
+include 'gradle-integrationtest'
+
