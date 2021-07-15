@@ -1,0 +1,76 @@
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+pr:
+  branches:
+    include:
+      - master
+
+trigger:
+  branches:
+    include:
+      - master
+
+resources:
+  repositories:
+    - repository: BDTemplateRepo
+      type: git
+      name: Engineering Enablement/template-blackduck
+      ref: master
+    - repository: PolarisTemplateRepo
+      type: git
+      name: Engineering Enablement/templates
+      ref: refs/tags/mavenAuth
+    - repository: self
+
+variables:
+  tag: '$(Build.BuildNumber)'
+  BDScanBranch: refs/heads/master-removethis
+  #DockerHelmBranch: refs/heads/master
+  ImageName: ohm/gradledemo
+  NEXUS_MAERSK_DEV_NET_CONNECTION: NexusMaerskDevNetRW-Imports-IIP
+
+stages:
+  - stage: Build
+    displayName: Build and Push Image
+    jobs:
+      - template: polaris.template.yml@PolarisTemplateRepo
+        parameters:
+          polarisScanBranch: master-removethis
+          nexusMaven: true
+          javaVersion: '11'
+
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: MavenAuthenticate@0
+            displayName: Nexus MaerskDevNet Authentication
+            inputs:
+              mavenServiceConnections: ${{variables.NEXUS_MAERSK_DEV_NET_CONNECTION}}
+
+          - task: Gradle@2
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              testResultsFiles: '**/TEST-*.xml'
+              tasks: 'clean build'
+
+      - job: BlackduckScan
+        dependsOn:
+          - Build
+        condition: eq(variables['Build.SourceBranch'], '${{ variables.BDScanBranch }}')
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: MavenAuthenticate@0
+            displayName: Nexus MaerskDevNet Authentication
+            inputs:
+              mavenServiceConnections: NexusMaerskDevNetRW-Imports-IIP
+
+          - template: blackduck.template.yml@BDTemplateRepo
